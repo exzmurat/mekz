@@ -16,21 +16,26 @@ const DIFF = {
 
 export class Goalkeeper {
   constructor(scene) {
-    this._group = new THREE.Group();
-    this._group.name = 'goalkeeper';
+  this._group = new THREE.Group();
+  this._group.name = 'goalkeeper';
 
-    this._diff = DIFF.medium;
-    this._jumpTarget = new THREE.Vector3(0, 0, GK_Z);
-    this._jumpStart = new THREE.Vector3(0, 0, GK_Z);
-    this._jumpT = 1;   // 0→1 tween progress
-    this._jumpDur = 0.45; // seconds
-    this._reacted = false;
+  this._diff = DIFF.medium;
+  this._jumpTarget = new THREE.Vector3(0, 0, GK_Z);
+  this._jumpStart = new THREE.Vector3(0, 0, GK_Z);
+  this._jumpT = 1;
+  this._jumpDur = 0.45;
+  this._reacted = false;
 
-    this._build();
-    this.reset();
+  this._build();
+  this._group.add(this._root);
 
-    scene.add(this._group);
-  }
+  this._root.scale.set(1.15, 1.15, 1.15);
+  this._group.position.set(0, GK_Y_BASE, GK_Z);
+
+  this.reset();
+
+  scene.add(this._group);
+}
 
   // ── Build ────────────────────────────────────────────────────────
 
