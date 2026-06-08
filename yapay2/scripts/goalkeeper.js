@@ -53,10 +53,10 @@ export class Goalkeeper {
     this._root.add(torso);
 
     // Head
-    const head = new THREE.Mesh(
-      new THREE.BoxGeometry(0.35, 0.35, 0.35),
-      skin
-    );
+  const head = new THREE.Mesh(
+  new THREE.SphereGeometry(0.18, 10, 8),
+  skin
+);
     head.position.y = 1.65;
     head.castShadow = true;
     this._root.add(head);
