@@ -1,0 +1,11 @@
+{
+  "name": "3D Penaltı",
+  "short_name": "Penaltı",
+  "description": "Gerçekçi 3D futbol penaltı oyunu",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "icons": []
+}

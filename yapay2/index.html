@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="3D Penaltı — Gerçekçi tarayıcı tabanlı futbol penaltı oyunu">
+  <meta name="theme-color" content="#0a0a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>3D Penaltı</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+
+  <!-- ─── Loading Screen ─────────────────────────────────────────── -->
+  <div id="loading-screen" class="screen active">
+    <div class="loading-content">
+      <div class="loading-ball">⚽</div>
+      <h1 class="loading-title">3D PENALTİ</h1>
+      <div class="loading-bar-wrap">
+        <div class="loading-bar" id="loading-bar"></div>
+      </div>
+      <p class="loading-text" id="loading-text">Yükleniyor…</p>
+    </div>
+  </div>
+
+  <!-- ─── Main Menu ──────────────────────────────────────────────── -->
+  <div id="main-menu" class="screen hidden">
+    <div class="overlay"></div>
+    <div class="menu-content">
+      <div class="menu-logo">
+        <div class="logo-icon-wrap"><span class="logo-icon">⚽</span></div>
+        <h1 class="logo-title">3D<br><span class="logo-sub">PENALTİ</span></h1>
+      </div>
+      <nav class="menu-nav">
+        <button class="menu-btn primary" id="btn-play">
+          <span class="btn-icon">▶</span> Oyna
+        </button>
+        <button class="menu-btn" id="btn-scores">
+          <span class="btn-icon">🏆</span> Skorlar
+        </button>
+        <button class="menu-btn" id="btn-settings">
+          <span class="btn-icon">⚙</span> Ayarlar
+        </button>
+      </nav>
+      <div class="menu-stats" id="menu-stats"></div>
+    </div>
+  </div>
+
+  <!-- ─── Mode Select ────────────────────────────────────────────── -->
+  <div id="mode-select" class="screen hidden">
+    <div class="overlay"></div>
+    <div class="panel">
+      <h2 class="panel-title">Oyun Modu Seç</h2>
+      <div class="cards">
+        <button class="card" data-mode="classic">
+          <span class="card-icon">⚽</span>
+          <h3>Klasik</h3>
+          <p>5 şut hakkı<br>Gol sayısını maksimize et</p>
+        </button>
+        <button class="card" data-mode="endless">
+          <span class="card-icon">♾</span>
+          <h3>Sonsuz</h3>
+          <p>Kaçırana kadar devam et<br>Rekor kır</p>
+        </button>
+        <button class="card" data-mode="target">
+          <span class="card-icon">🎯</span>
+          <h3>Hedef</h3>
+          <p>Kaledeki hedefleri vur<br>Kombo yap, puan topla</p>
+        </button>
+      </div>
+      <button class="back-btn" id="mode-back">← Geri</button>
+    </div>
+  </div>
+
+  <!-- ─── Difficulty Select ─────────────────────────────────────── -->
+  <div id="difficulty-select" class="screen hidden">
+    <div class="overlay"></div>
+    <div class="panel">
+      <h2 class="panel-title">Zorluk Seç</h2>
+      <div class="cards">
+        <button class="card diff-easy" data-diff="easy">
+          <span class="card-icon">😊</span>
+          <h3>Kolay</h3>
+          <p>Yavaş kaleci<br>İdeal başlangıç</p>
+        </button>
+        <button class="card diff-medium" data-diff="medium">
+          <span class="card-icon">😤</span>
+          <h3>Orta</h3>
+          <p>Dengeli oyun<br>Gerçekçi hissiyat</p>
+        </button>
+        <button class="card diff-hard" data-diff="hard">
+          <span class="card-icon">😈</span>
+          <h3>Zor</h3>
+          <p>Hızlı kaleci<br>Gerçek zorluk</p>
+        </button>
+      </div>
+      <button class="back-btn" id="diff-back">← Geri</button>
+    </div>
+  </div>
+
+  <!-- ─── HUD ───────────────────────────────────────────────────── -->
+  <div id="hud" class="screen hidden">
+    <div class="hud-top">
+      <div class="hud-cell">
+        <div class="hud-label">GOL</div>
+        <div class="hud-value" id="hud-score">0</div>
+      </div>
+      <div class="hud-cell center">
+        <div class="hud-label" id="hud-mode-label">KLASİK</div>
+        <div class="hud-shots" id="hud-shots"></div>
+      </div>
+      <div class="hud-cell right">
+        <div class="hud-label">İSABET</div>
+        <div class="hud-value" id="hud-accuracy">–</div>
+      </div>
+    </div>
+
+    <div class="hud-diff-badge" id="hud-diff-badge">ORTA</div>
+    <button class="hud-pause-btn" id="hud-pause-btn" title="Duraklat">❚❚</button>
+
+    <div class="hud-instruction" id="hud-instruction">
+      <span class="inst-arrow">↑</span> Şut atmak için sürükle &amp; bırak
+    </div>
+
+    <div class="power-wrap hidden" id="power-wrap">
+      <span class="power-label">GÜÇ</span>
+      <div class="power-track"><div class="power-fill" id="power-fill"></div></div>
+    </div>
+
+    <!-- Aim reticle on the goal -->
+    <div class="aim-ring hidden" id="aim-ring"></div>
+
+    <div class="shot-overlay hidden" id="shot-overlay">
+      <div class="shot-text" id="shot-text"></div>
+    </div>
+  </div>
+
+  <!-- ─── Pause Menu ────────────────────────────────────────────── -->
+  <div id="pause-menu" class="screen hidden">
+    <div class="overlay"></div>
+    <div class="panel small">
+      <h2 class="panel-title">⏸ Duraklat</h2>
+      <button class="menu-btn primary" id="btn-resume">▶ Devam Et</button>
+      <button class="menu-btn" id="btn-restart">↺ Yeniden Başla</button>
+      <button class="menu-btn danger" id="btn-to-menu">⌂ Ana Menü</button>
+    </div>
+  </div>
+
+  <!-- ─── Result Screen ─────────────────────────────────────────── -->
+  <div id="result-screen" class="screen hidden">
+    <div class="overlay"></div>
+    <div class="panel result-panel">
+      <div class="result-icon" id="result-icon">🏆</div>
+      <h2 class="result-title" id="result-title">OYUN BİTTİ</h2>
+      <div class="result-stats">
+        <div class="result-stat"><span class="rs-label">GOL</span><span class="rs-val" id="res-goals">0</span></div>
+        <div class="result-stat"><span class="rs-label">KURTARMA</span><span class="rs-val" id="res-saves">0</span></div>
+        <div class="result-stat"><span class="rs-label">KAÇIRILDI</span><span class="rs-val" id="res-misses">0</span></div>
+        <div class="result-stat"><span class="rs-label">İSABET</span><span class="rs-val" id="res-acc">–</span></div>
+      </div>
+      <div class="new-record hidden" id="new-record">🌟 YENİ REKOR!</div>
+      <div class="result-actions">
+        <button class="menu-btn primary" id="btn-play-again">↺ Tekrar Oyna</button>
+        <button class="menu-btn" id="btn-res-menu">⌂ Ana Menü</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Scores Screen ────────────────────────────────────────── -->
+  <div id="scores-screen" class="screen hidden">
+    <div class="overlay"></div>
+    <div class="panel">
+      <h2 class="panel-title">🏆 En Yüksek Skorlar</h2>
+      <div class="scores-list" id="scores-list"></div>
+      <button class="back-btn" id="scores-back">← Geri</button>
+    </div>
+  </div>
+
+  <!-- ─── Settings Screen ───────────────────────────────────────── -->
+  <div id="settings-screen" class="screen hidden">
+    <div class="overlay"></div>
+    <div class="panel">
+      <h2 class="panel-title">⚙ Ayarlar</h2>
+      <div class="settings-list">
+        <div class="setting-row">
+          <span class="setting-label">Ses Efektleri</span>
+          <button class="toggle-btn" id="tog-sound" data-state="on">AÇIK</button>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Grafik Kalitesi</span>
+          <button class="toggle-btn" id="tog-quality" data-state="auto">OTO</button>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Varsayılan Zorluk</span>
+          <button class="toggle-btn" id="tog-diff" data-state="medium">ORTA</button>
+        </div>
+      </div>
+      <button class="back-btn" id="settings-back">← Geri</button>
+    </div>
+  </div>
+
+  <script type="module" src="scripts/main.js"></script>
+</body>
+</html>
