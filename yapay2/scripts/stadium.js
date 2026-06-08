@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 export function createStadium(scene, isLow) {
   const root = new THREE.Group();
-  root.name  = 'stadium';
+  root.name = 'stadium';
 
   _addGround(root);
   _addFieldMarkings(root);
@@ -18,8 +18,10 @@ export function createStadium(scene, isLow) {
 // ── Ground ────────────────────────────────────────────────────────────
 function _addGround(root) {
   // Base grass
-  const grassMat = new THREE.MeshLambertMaterial({ color: 0x1e6b1e });
-  const ground   = new THREE.Mesh(
+  const grassMat = new THREE.MeshLambertMaterial({
+    color: 0x3f9b3f
+  });
+  const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(120, 120),
     grassMat
   );
@@ -28,7 +30,9 @@ function _addGround(root) {
   root.add(ground);
 
   // Alternating lighter stripes
-  const stripeMat = new THREE.MeshLambertMaterial({ color: 0x238c23 });
+  const stripeMat = new THREE.MeshLambertMaterial({
+    color: 0x56b856
+  });
   for (let i = 0; i < 12; i += 2) {
     const stripe = new THREE.Mesh(
       new THREE.PlaneGeometry(120, 10),
@@ -48,7 +52,7 @@ function _addFieldMarkings(root) {
   // Helper: draw a flat white rectangle on the ground
   function line(x1, z1, x2, z2, thick = 0.07) {
     const cx = (x1 + x2) / 2, cz = (z1 + z2) / 2;
-    const dx = x2 - x1,       dz = z2 - z1;
+    const dx = x2 - x1, dz = z2 - z1;
     const len = Math.sqrt(dx * dx + dz * dz) + thick;
     const ang = Math.atan2(dx, dz);
     const m = new THREE.Mesh(new THREE.PlaneGeometry(thick, len), mat);
@@ -58,23 +62,23 @@ function _addFieldMarkings(root) {
     root.add(m);
   }
 
-  const GZ  = -11;    // goal z
-  const GW  = 3.66;   // half-width of goal
+  const GZ = -11;    // goal z
+  const GW = 3.66;   // half-width of goal
   const PAW = 20.16;  // penalty area half-width
   const PAD = 16.5;   // penalty area depth
 
   // Goal line
   line(-PAW, GZ, PAW, GZ);
   // Penalty area sides
-  line(-PAW, GZ,  -PAW, GZ - PAD);
-  line( PAW, GZ,   PAW, GZ - PAD);
+  line(-PAW, GZ, -PAW, GZ - PAD);
+  line(PAW, GZ, PAW, GZ - PAD);
   // Penalty area front
   line(-PAW, GZ - PAD, PAW, GZ - PAD);
 
   // 6-yard box
   const SBW = 9.16, SBD = 5.5;
   line(-SBW, GZ, -SBW, GZ - SBD);
-  line( SBW, GZ,  SBW, GZ - SBD);
+  line(SBW, GZ, SBW, GZ - SBD);
   line(-SBW, GZ - SBD, SBW, GZ - SBD);
 
   // Penalty spot
@@ -110,7 +114,7 @@ function _addFieldMarkings(root) {
 
 // ── Stands ────────────────────────────────────────────────────────────
 function _addStands(root, isLow) {
-  const dark    = new THREE.MeshLambertMaterial({ color: 0x111128 });
+  const dark = new THREE.MeshLambertMaterial({ color: 0x111128 });
   const seatColors = [0x1a2090, 0x8c1a1a, 0x1a8c1a, 0x8c8c1a];
 
   function makeBank(width, depth, tiers, cx, cz, rotY) {
@@ -123,7 +127,7 @@ function _addStands(root, isLow) {
         dark
       );
       step.position.set(0, i * 1.4, i * depth * 0.6);
-      step.castShadow    = false;
+      step.castShadow = false;
       step.receiveShadow = true;
       bank.add(step);
 
@@ -140,8 +144,10 @@ function _addStands(root, isLow) {
 
       // Simple crowd (blobs)
       if (!isLow) {
-        const crowdMat = new THREE.MeshLambertMaterial({ color: 0xddddee });
-        const crowd    = new THREE.Mesh(
+        const crowdMat = new THREE.MeshLambertMaterial({
+          color: 0xffffff
+        });
+        const crowd = new THREE.Mesh(
           new THREE.BoxGeometry(width * 0.88, 0.45, depth * 0.4),
           crowdMat
         );
@@ -158,11 +164,11 @@ function _addStands(root, isLow) {
   // Back stand (behind goal)
   root.add(makeBank(80, 4, isLow ? 5 : 9, 0, -44, 0));
   // Front stand
-  root.add(makeBank(80, 4, isLow ? 5 : 9, 0,  26, Math.PI));
+  root.add(makeBank(80, 4, isLow ? 5 : 9, 0, 26, Math.PI));
   // Left stand
   root.add(makeBank(60, 4, isLow ? 4 : 7, -54, -11, Math.PI / 2));
   // Right stand
-  root.add(makeBank(60, 4, isLow ? 4 : 7,  54, -11, -Math.PI / 2));
+  root.add(makeBank(60, 4, isLow ? 4 : 7, 54, -11, -Math.PI / 2));
 }
 
 // ── Floodlights ───────────────────────────────────────────────────────
@@ -203,13 +209,20 @@ function _addFloodlights(root, scene, isLow) {
 
     // Spotlights
     if (!isLow) {
-      const spot = new THREE.SpotLight(0xfff8e8, 2.5, 80, Math.PI / 5, 0.4, 1.2);
+      const spot = new THREE.SpotLight(
+        0xffffff,
+        8,
+        150,
+        Math.PI / 4,
+        0.3,
+        1
+      );
       spot.position.set(Math.sign(-x) * 3, 29, 0);
       spot.target.position.set(0, 0, -8);
       spot.castShadow = true;
       spot.shadow.mapSize.set(512, 512);
       spot.shadow.camera.near = 5;
-      spot.shadow.camera.far  = 90;
+      spot.shadow.camera.far = 90;
       g.add(spot);
       g.add(spot.target);
     } else {
@@ -223,29 +236,33 @@ function _addFloodlights(root, scene, isLow) {
   }
 
   root.add(makePole(-50, -30));
-  root.add(makePole( 50, -30));
-  root.add(makePole(-50,  10));
-  root.add(makePole( 50,  10));
+  root.add(makePole(50, -30));
+  root.add(makePole(-50, 10));
+  root.add(makePole(50, 10));
 
   // Ambient + hemisphere
-  const ambient = new THREE.AmbientLight(0x334466, 0.7);
+  const ambient = new THREE.AmbientLight(0xffffff, 1.8);
   scene.add(ambient);
 
-  const hemi = new THREE.HemisphereLight(0x224488, 0x112200, 0.5);
+  const hemi = new THREE.HemisphereLight(
+    0xaad4ff,
+    0x335533,
+    1.5
+  );
   scene.add(hemi);
 }
 
 // ── Sky dome ──────────────────────────────────────────────────────────
 function _addSkyDome(scene) {
   // Stars
-  const starGeo  = new THREE.BufferGeometry();
+  const starGeo = new THREE.BufferGeometry();
   const starCount = 600;
   const positions = new Float32Array(starCount * 3);
   for (let i = 0; i < starCount; i++) {
     const theta = Math.random() * Math.PI * 2;
-    const phi   = Math.acos(Math.random() * 2 - 1);
-    const r     = 200 + Math.random() * 50;
-    positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+    const phi = Math.acos(Math.random() * 2 - 1);
+    const r = 200 + Math.random() * 50;
+    positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
     positions[i * 3 + 1] = Math.abs(r * Math.cos(phi));
     positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
   }
