@@ -2,13 +2,13 @@
 import * as THREE from 'three';
 
 const BALL_RADIUS = 0.22;
-const GRAVITY     = -9.8;
-const GROUND_Y    = BALL_RADIUS;
+const GRAVITY = -9.8;
+const GROUND_Y = BALL_RADIUS;
 
 export class Ball {
   constructor(scene) {
-    this._vel   = new THREE.Vector3();
-    this._spin  = new THREE.Vector3();
+    this._vel = new THREE.Vector3();
+    this._spin = new THREE.Vector3();
     this._alive = false;
 
     this._group = new THREE.Group();
@@ -26,22 +26,22 @@ export class Ball {
   _buildBall() {
     const tex = this._buildTexture();
 
-    const mat  = new THREE.MeshPhongMaterial({
-      map:       tex,
-      shininess: 60,
-      specular:  new THREE.Color(0x333333),
+    const mat = new THREE.MeshStandardMaterial({
+      map: tex,
+      roughness: 0.65,
+      metalness: 0.05
     });
     this._mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(BALL_RADIUS, 24, 16),
+      new THREE.SphereGeometry(BALL_RADIUS, 48, 32),
       mat
     );
-    this._mesh.castShadow    = true;
+    this._mesh.castShadow = true;
     this._mesh.receiveShadow = false;
 
     this._group.add(this._mesh);
 
     // Shadow blob on ground
-    const blobGeo = new THREE.CircleGeometry(0.22, 12);
+    const blobGeo = new THREE.CircleGeometry(0.30, 24);
     const blobMat = new THREE.MeshBasicMaterial({
       color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false
     });
@@ -54,9 +54,9 @@ export class Ball {
   /** Procedural black/white football texture */
   _buildTexture() {
     const SIZE = 256;
-    const cv   = document.createElement('canvas');
+    const cv = document.createElement('canvas');
     cv.width = cv.height = SIZE;
-    const ctx  = cv.getContext('2d');
+    const ctx = cv.getContext('2d');
 
     // White base
     ctx.fillStyle = '#ffffff';
@@ -64,12 +64,12 @@ export class Ball {
 
     // Draw 5 black pentagons in UV space
     const pentagons = [
-      [0.5,  0.5],   // centre
-      [0.5,  0.04],  // top
+      [0.5, 0.5],   // centre
+      [0.5, 0.04],  // top
       [0.04, 0.35],  // upper-left
       [0.96, 0.35],  // upper-right
-      [0.2,  0.88],  // lower-left
-      [0.8,  0.88],  // lower-right
+      [0.2, 0.88],  // lower-left
+      [0.8, 0.88],  // lower-right
     ];
 
     ctx.fillStyle = '#111111';
@@ -99,7 +99,7 @@ export class Ball {
     this._spin.set(0, 0, 0);
     this._alive = false;
     this._bounced = false;
-    this._mesh.visible   = true;
+    this._mesh.visible = true;
     this._shadow.visible = true;
     // Reset shadow scale
     this._shadow.scale.set(1, 1, 1);
@@ -126,8 +126,11 @@ export class Ball {
 
     // Rotate ball visually based on velocity
     const speed = this._vel.length();
-    const axis  = new THREE.Vector3(-this._vel.z, 0, this._vel.x).normalize();
-    this._mesh.rotateOnWorldAxis(axis, speed * dt / BALL_RADIUS);
+    const axis = new THREE.Vector3(-this._vel.z, 0, this._vel.x).normalize();
+    this._mesh.rotateOnWorldAxis(
+      axis,
+      speed * dt * 1.8 / BALL_RADIUS
+    );
 
     // Ground bounce
     if (this._group.position.y < GROUND_Y && !this._bounced) {
@@ -153,7 +156,7 @@ export class Ball {
 
   bouncePost() {
     this._vel.x = -this._vel.x * 0.6;
-    this._vel.z =  this._vel.z * 0.3;
+    this._vel.z = this._vel.z * 0.3;
     this._vel.y = Math.abs(this._vel.y * 0.5) + 1;
   }
 
@@ -165,7 +168,7 @@ export class Ball {
   }
 
   hide() {
-    this._mesh.visible   = false;
+    this._mesh.visible = false;
     this._shadow.visible = false;
   }
 }
