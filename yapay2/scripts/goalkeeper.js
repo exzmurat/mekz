@@ -118,7 +118,7 @@ export class Goalkeeper {
     // Number on jersey
     // (skipped — too complex for canvas texture without canvas2d)
 
-    this._root.scale.set(1.45, 1.45, 1.45);
+    this._root.scale.set(1.15, 1.15, 1.15);
     this._group.position.set(0, GK_Y_BASE, GK_Z);
   }
 
