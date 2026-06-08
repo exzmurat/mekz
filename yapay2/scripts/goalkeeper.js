@@ -2,29 +2,29 @@
 import * as THREE from 'three';
 import { GOAL } from './goal.js';
 
-const GK_Z      = GOAL.Z + 0.55;   // stands slightly in front of goal line
+const GK_Z = GOAL.Z + 0.55;   // stands slightly in front of goal line
 const GK_Y_BASE = 0;
 const MAX_JUMP_X = 3.2;
 const MAX_JUMP_Y = 1.9;
 
 // Difficulty settings: { reactionMs, saveRadius, randomChance }
 const DIFF = {
-  easy:   { reactionMs: 700, saveRadius: 1.05, randomChance: 0.85 },
+  easy: { reactionMs: 700, saveRadius: 1.05, randomChance: 0.85 },
   medium: { reactionMs: 380, saveRadius: 1.20, randomChance: 0.50 },
-  hard:   { reactionMs: 140, saveRadius: 1.40, randomChance: 0.20 },
+  hard: { reactionMs: 140, saveRadius: 1.40, randomChance: 0.20 },
 };
 
 export class Goalkeeper {
   constructor(scene) {
-    this._group     = new THREE.Group();
+    this._group = new THREE.Group();
     this._group.name = 'goalkeeper';
 
-    this._diff     = DIFF.medium;
+    this._diff = DIFF.medium;
     this._jumpTarget = new THREE.Vector3(0, 0, GK_Z);
-    this._jumpStart  = new THREE.Vector3(0, 0, GK_Z);
-    this._jumpT      = 1;   // 0→1 tween progress
-    this._jumpDur    = 0.45; // seconds
-    this._reacted    = false;
+    this._jumpStart = new THREE.Vector3(0, 0, GK_Z);
+    this._jumpT = 1;   // 0→1 tween progress
+    this._jumpDur = 0.45; // seconds
+    this._reacted = false;
 
     this._build();
     this.reset();
@@ -36,11 +36,11 @@ export class Goalkeeper {
 
   _build() {
     // Materials
-    const jersey  = new THREE.MeshPhongMaterial({ color: 0xff6600 }); // orange
-    const shorts  = new THREE.MeshPhongMaterial({ color: 0x222266 });
-    const skin    = new THREE.MeshPhongMaterial({ color: 0xffcc88 });
-    const gloves  = new THREE.MeshPhongMaterial({ color: 0xffee44 }); // yellow gloves
-    const boots   = new THREE.MeshPhongMaterial({ color: 0x111111 });
+    const jersey = new THREE.MeshPhongMaterial({ color: 0x00d4ff }); // orange
+    const shorts = new THREE.MeshPhongMaterial({ color: 0x222266 });
+    const skin = new THREE.MeshPhongMaterial({ color: 0xffcc88 });
+    const gloves = new THREE.MeshPhongMaterial({ color: 0xffee44 }); // yellow gloves
+    const boots = new THREE.MeshPhongMaterial({ color: 0x111111 });
 
     const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 
@@ -53,7 +53,10 @@ export class Goalkeeper {
     this._root.add(torso);
 
     // Head
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), skin);
+    const head = new THREE.Mesh(
+      new THREE.BoxGeometry(0.35, 0.35, 0.35),
+      skin
+    );
     head.position.y = 1.65;
     head.castShadow = true;
     this._root.add(head);
@@ -74,15 +77,18 @@ export class Goalkeeper {
     const lLower = new THREE.Mesh(box(0.14, 0.36, 0.14), skin);
     lLower.position.y = -0.55;
     this._lArm.add(lLower);
-    const lGlove = new THREE.Mesh(box(0.20, 0.20, 0.20), gloves);
+    const lGlove = new THREE.Mesh(
+      box(0.28, 0.28, 0.28),
+      gloves
+    );
     lGlove.position.y = -0.78;
     this._lArm.add(lGlove);
-    this._lArm.position.set(-0.38, 1.32, 0);
+    this._lArm.position.set(-0.50, 1.32, 0);
     this._root.add(this._lArm);
 
     // Right arm
     this._rArm = this._lArm.clone();
-    this._rArm.position.set(0.38, 1.32, 0);
+    this._rArm.position.set(0.50, 1.32, 0);
     this._root.add(this._rArm);
 
     // Pelvis
@@ -112,7 +118,7 @@ export class Goalkeeper {
     // Number on jersey
     // (skipped — too complex for canvas texture without canvas2d)
 
-    this._group.add(this._root);
+    this._root.scale.set(1.45, 1.45, 1.45);
     this._group.position.set(0, GK_Y_BASE, GK_Z);
   }
 
@@ -126,12 +132,12 @@ export class Goalkeeper {
     this._group.position.set(0, GK_Y_BASE, GK_Z);
     this._root.rotation.set(0, 0, 0);
     this._lArm.rotation.set(-0.2, 0, -0.3);
-    this._rArm.rotation.set(-0.2, 0,  0.3);
+    this._rArm.rotation.set(-0.2, 0, 0.3);
     this._lLeg.rotation.set(0, 0, 0);
     this._rLeg.rotation.set(0, 0, 0);
     this._jumpTarget.set(0, GK_Y_BASE, GK_Z);
-    this._jumpStart.set(0,  GK_Y_BASE, GK_Z);
-    this._jumpT   = 1;
+    this._jumpStart.set(0, GK_Y_BASE, GK_Z);
+    this._jumpT = 1;
     this._reacted = false;
   }
 
@@ -165,10 +171,10 @@ export class Goalkeeper {
     } else {
       // Predict from shot + habit
       const habBias = this._habitBias(history);
-      tX = (shotDx / Math.max(window.innerWidth,  1)) * MAX_JUMP_X * 2.2 + habBias * 0.6;
+      tX = (shotDx / Math.max(window.innerWidth, 1)) * MAX_JUMP_X * 2.2 + habBias * 0.6;
       tY = Math.max(0, (-shotDy / Math.max(window.innerHeight, 1)) * MAX_JUMP_Y * 1.8 + 0.5);
       tX = Math.max(-MAX_JUMP_X, Math.min(MAX_JUMP_X, tX));
-      tY = Math.max(0,           Math.min(MAX_JUMP_Y,  tY));
+      tY = Math.max(0, Math.min(MAX_JUMP_Y, tY));
     }
 
     this._startJump(tX, tY);
@@ -191,7 +197,7 @@ export class Goalkeeper {
     // Rotate arms up
     const spread = targetX > 0 ? -0.3 : 0.3;
     this._lArm.rotation.z = -1.0 + spread;
-    this._rArm.rotation.z =  1.0 + spread;
+    this._rArm.rotation.z = 1.0 + spread;
     this._lArm.rotation.x = -0.8;
     this._rArm.rotation.x = -0.8;
   }
@@ -203,13 +209,13 @@ export class Goalkeeper {
     if (this._jumpT >= 1) return;
 
     this._jumpT = Math.min(1, this._jumpT + dt / this._jumpDur);
-    const t  = this._easeOut(this._jumpT);
+    const t = this._easeOut(this._jumpT);
 
     this._group.position.lerpVectors(this._jumpStart, this._jumpTarget, t);
 
     // Tilt body in jump direction
     this._root.rotation.z = -Math.sign(this._jumpTarget.x) * t * 0.4;
-    this._lLeg.rotation.x =  t * 0.5;
+    this._lLeg.rotation.x = t * 0.5;
     this._rLeg.rotation.x = -t * 0.3;
   }
 
@@ -220,9 +226,9 @@ export class Goalkeeper {
    */
   checkSave(ballPos) {
     const gkPos = this._group.position;
-    const dx    = Math.abs(ballPos.x - gkPos.x);
-    const dy    = Math.abs(ballPos.y - (gkPos.y + 0.9));  // gk centre height
-    const r     = this._diff.saveRadius;
+    const dx = Math.abs(ballPos.x - gkPos.x);
+    const dy = Math.abs(ballPos.y - (gkPos.y + 0.9));  // gk centre height
+    const r = this._diff.saveRadius;
     return dx < r * 0.85 && dy < r * 0.9;
   }
 }
