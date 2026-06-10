@@ -1,3 +1,7 @@
+import athleteDeadliftPrep from "./assets/images/athlete_deadlift_prep_1781030298123.png";
+import athleteHeavyDeadlift from "./assets/images/athlete_heavy_deadlift_1781030313979.png";
+import athleteMindsetRest from "./assets/images/athlete_mindset_rest_1781030330591.png";
+import sunriseGymEmpty from "./assets/images/sunrise_gym_empty_1781030281990.png";
 import React, { useState, useEffect, useRef } from "react";
 import { 
   Dumbbell, 
@@ -48,10 +52,10 @@ const ALL_STOIC_QUOTES = [
 
 // Hardcoded paths to our magnificent generated assets
 const GYM_ASSETS = {
-  sunrise_gym_empty: "/src/assets/images/sunrise_gym_empty_1781030281990.png",
-  athlete_deadlift_prep: "/src/assets/images/athlete_deadlift_prep_1781030298123.png",
-  athlete_heavy_deadlift: "/src/assets/images/athlete_heavy_deadlift_1781030313979.png",
-  athlete_mindset_rest: "/src/assets/images/athlete_mindset_rest_1781030330591.png"
+  sunrise_gym_empty: sunriseGymEmpty,
+  athlete_deadlift_prep: athleteDeadliftPrep,
+  athlete_heavy_deadlift: athleteHeavyDeadlift,
+  athlete_mindset_rest: athleteMindsetRest
 };
 
 // Beautiful static fallback motivation states and Turkish gym database
