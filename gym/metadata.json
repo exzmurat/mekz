@@ -1,0 +1,6 @@
+{
+  "name": "5 AM Gym Motivator",
+  "description": "An immersive, cinematic audio-visual motivator and interactive trainer guiding a determined athlete's morning routine and sunrise powerlifting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
